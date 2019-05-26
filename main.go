@@ -1,9 +1,8 @@
 package main
 
 import (
-	"AVWServer/protocol"
+	"./protocol"
 	"net/http"
-	"strings"
 )
 
 var func_map map[string]map[string]http.Handler
@@ -22,13 +21,13 @@ func dispatch(w http.ResponseWriter, r *http.Request){
 		protocol.WeosocketHandler(w,r)
 		return
 	}
-	getPath_ := strings.Split(r.RequestURI,"/")
-	println(r.Method,r.RequestURI,getPath_[1])
 
 	switch r.Method {
 	case http.MethodGet:
+		protocol.HttpGetHandler(w,r)
 		break
 	case http.MethodPost:
+		protocol.HttpPostHandler(w,r)
 		break
 	case http.MethodDelete:
 		break

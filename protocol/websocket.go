@@ -1,28 +1,26 @@
 package protocol
 
 import (
-	"fmt"
 	"github.com/gorilla/websocket"
 	"net/http"
-	"time"
+	"strings"
 )
+
+var Conn_map = make(map[string]chan string)
 
 func WeosocketHandler(w http.ResponseWriter, r*http.Request) {
 	u := websocket.Upgrader{ReadBufferSize: 1, WriteBufferSize: 10000}
 	c,err := u.Upgrade(w,r,nil)
+
 	if err != nil  {
 		return
 	}
-	fmt.Print(c.RemoteAddr().String())
-	fmt.Println("ping")
-
+	remote := c.RemoteAddr().String()
+	remote = remote[0:strings.Index(remote,":")]
+	message_list := make(chan string)
+	Conn_map[remote] = message_list
 	for {
-		if true {
-			c.WriteMessage(websocket.TextMessage,[]byte("请求就绪"))
-			time.Sleep(time.Millisecond * 100)
-		} else {
-			c.Close()
-			return
-		}
+		message := <- message_list
+		c.WriteMessage(websocket.TextMessage,[]byte(message))
 	}
 }
